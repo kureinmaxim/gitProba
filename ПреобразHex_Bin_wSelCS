@@ -1,0 +1,204 @@
+Этот код предназначен для обработки файла в формате Intel HEX и его конвертации в бинарный формат. Программа выполняет несколько операций, включая определение конечного адреса программы в HEX-файле, вычисление контрольной суммы, корректировку контрольной суммы (по запросу пользователя) и запись данных в соответствующие выходные бинарные файлы.
+Пошаговое объяснение кода
+1. Описание main функции
+Функция main координирует весь процесс:
+•	Загружает Intel HEX-файл (IntelHex) и проверяет его существование.
+•	Определяет пути к входным и выходным файлам.
+•	Рассчитывает конечный адрес программы в HEX-файле.
+•	Конвертирует данные из HEX в бинарный формат.
+•	Записывает бинарные данные без контрольной суммы в файл.
+•	Запрашивает у пользователя желаемую контрольную сумму.
+•	Выполняет корректировку данных для достижения указанной контрольной суммы.
+•	Сохраняет скорректированные данные в бинарный файл с обновленной контрольной суммой.
+2. Обработка путей входного и выходных файлов
+
+if not os.path.exists(input_hex_file):
+    # Если файл не найден в одной директории, ищем в другой
+    ...
+Если файл не находится по стандартному пути ProjectCodeMaster, программа переключает пути для использования с Project_CodeMaster. Также она задает пути для нескольких выходных файлов:
+•	output_bin_file: файл для бинарных данных без контрольной суммы.
+•	output_bin_file_cs: файл для данных с добавленной корректировкой контрольной суммы.
+•	output_bin_file_cs_real: файл с "реальной" контрольной суммой исходного файла.
+3. Чтение HEX файла
+
+hex_data = intelhex.IntelHex(input_hex_file)
+Для чтения данных используется библиотека intelhex, позволяющая работать с Intel HEX файлами. После загрузки содержимого файл будет преобразован в формат, доступный для сегментации и конвертации в бинарный массив.
+4. Определение конечного адреса программы
+
+program_end = max(hex_data.segments(), key=lambda seg: seg[1])[1]
+if program_end % 2 == 1:
+    program_end = (program_end + 1) & 0xFFFF
+hex_data.segments() возвращает все диапазоны (сегменты) адресов данных в HEX-файле. Находится максимальный конечный адрес программы (program_end). Если этот адрес нечетный, он округляется до ближайшего четного значения.
+5. Конвертация в бинарный формат
+
+bin_data = hex_data.tobinarray(start=0, size=bin_size)
+bin_data_cs = hex_data.tobinarray(start=0, size=bin_size2cs)
+Данные из HEX-файла конвертируются в два бинарных массива:
+•	bin_data: используется для записи данных в файл без добавления контрольной суммы.
+•	bin_data_cs: аналогичный массив, но используется для дальнейшего вычисления и корректировки контрольной суммы.
+6. Запись данных без контрольной суммы
+
+with open(output_bin_file, 'wb') as f:
+    f.write(bin_data)
+Конвертированные бинарные данные записываются в выходной файл (output_bin_file) без каких-либо дополнительных изменений.
+7. Запрос контрольной суммы у пользователя
+
+while True:
+    try:
+        user_input = input("Введите желаемую контрольную сумму (в формате 0xFFFF): ")
+        target_checksum = int(user_input, 16)
+        if 0 <= target_checksum <= 0xFFFF:
+            break
+    ...
+Пользователь должен ввести желаемое значение контрольной суммы в шестнадцатеричном формате (например, 0x1234). Если введено некорректное значение, программа повторяет запрос.
+8. Вычисление текущей контрольной суммы
+
+checksum = calculate_checksum(bin_data_cs, start_address)
+checksum_bytes = checksum.to_bytes(2, byteorder='big')
+print(f"Контрольная сумма исходного файла: {checksum:04X}")
+Функция calculate_checksum вычисляет контрольную сумму bin_data_cs, стартуя с адреса start_address. Контрольная сумма преобразуется в нужный формат байтов, чтобы быть готовой для записи.
+9. Запись исходного файла с текущей контрольной суммой
+
+with open(output_bin_file_cs_real, 'wb') as f:
+    f.write(bin_data_cs_real)
+    f.write(checksum_bytes)
+Изначальные бинарные данные вместе с рассчитанной контрольной суммой записываются в файл output_bin_file_cs_real.
+ 
+10. Корректировка данных для достижения контрольной суммы
+
+adjust_checksum(bin_data_cs_real, target_checksum, start_address, program_end)
+final_checksum = calculate_checksum(bin_data_cs_real, start_address)
+final_checksum_bytes = final_checksum.to_bytes(2, 'big')
+Функция adjust_checksum изменяет данные в массиве bin_data_cs_real, чтобы итоговая контрольная сумма соответствовала заданной пользователем (target_checksum). После корректировки производится повторное вычисление контрольной суммы для проверки.
+ 
+11. Запись файла с откорректированной контрольной суммой
+
+with open(output_bin_file_cs, 'wb') as f:
+    f.write(bin_data_cs_real)
+    f.write(final_checksum_bytes)
+Скорректированные данные записываются в выходной файл output_bin_file_cs. Финальная контрольная сумма добавляется в конец файла.
+ 
+12. Проверка контрольной суммы
+if final_checksum == target_checksum:
+    print("Контрольная сумма успешно достигнута.")
+else:
+    print("Ошибка: контрольная сумма не совпадает!")
+Программа проверяет, достигнута ли желаемая контрольная сумма.
+Основные функции
+•	calculate_checksum: вычисляет текущую контрольную сумму бинарных данных.
+•	adjust_checksum: изменяет данные после конца программы, чтобы достичь нужной контрольной суммы.
+Пример работы
+1.	Пользователь вводит файл в формате Intel HEX.
+2.	Программа конвертирует файл в бинарный, записывает его и рассчитывает контрольные суммы.
+3.	У пользователя запрашивается желаемая контрольная сумма (в шестнадцатеричном формате).
+4.	Программа корректирует данные для достижения этой контрольной суммы и записывает результат в файл.
+import intelhex
+import os
+
+def calculate_checksum(data, start_address):
+    checksum = 0
+    for i in range(start_address, len(data), 2):
+        word = (data[i] << 8) + data[i + 1]
+        checksum += word
+    return checksum & 0xFFFF
+
+def adjust_checksum(data, target_checksum, start_address, program_end):
+    # Calculate the current checksum
+    current_checksum = calculate_checksum(data, start_address)
+    #print(f"Current checksum: {current_checksum:04X}")
+
+    # Consider existing byte values after program_end
+    current_value = (data[program_end] << 8) + data[program_end + 1]
+    current_checksum -= current_value
+    current_checksum &= 0xFFFF
+
+    diff = (target_checksum - current_checksum) & 0xFFFF
+
+    # Adjust the two bytes immediately after the program end
+    high_byte = (diff >> 8) & 0xFF
+    low_byte = diff & 0xFF
+
+    # Modify the two bytes after the program end in the binary data
+    data[program_end] = high_byte
+    data[program_end + 1] = low_byte
+
+print(f"Adjusted bytes to achieve target checksum: {high_byte:02X} {low_byte:02X}")
+
+def main():
+
+    input_hex_file = "C:/Project/ProjectCodeMaster/PriborTL7/PriborTL7/Debug/Exe/PriborTL7.HEX"
+    if not os.path.exists(input_hex_file):
+        print(f"Файл найден Project_CodeMaster: {input_hex_file}")
+        input_hex_file = "C:/Project/Project_CodeMaster/PriborTL7/PriborTL7/Debug/Exe/PriborTL7.HEX"
+        output_bin_file = "C:/Project/Project_CodeMaster/PriborTL7/PriborTL7/Debug/Exe/PriborTL7.bin"
+        output_bin_file_cs = "C:/Project/Project_CodeMaster/PriborTL7/PriborTL7/Debug/Exe/PriborTL7_cs.bin"
+        output_bin_file_cs_real = "C:/Project/Project_CodeMaster/PriborTL7/PriborTL7/Debug/Exe/PriborTL7_csReal.bin"
+    else:
+        print(f"Файл найден ProjectCodeMaster: {input_hex_file}")
+        output_bin_file = "C:/Project/ProjectCodeMaster/PriborTL7/PriborTL7/Debug/Exe/PriborTL7.bin"
+        output_bin_file_cs = "C:/Project/ProjectCodeMaster/PriborTL7/PriborTL7/Debug/Exe/PriborTL7_cs.bin"
+        output_bin_file_cs_real = "C:/Project/ProjectCodeMaster/PriborTL7/PriborTL7/Debug/Exe/PriborTL7_csReal.bin"
+
+    start_address = 0x2000
+    bin_size = 32768
+    bin_size2cs = 32766
+
+    # Load the hex file
+    hex_data = intelhex.IntelHex(input_hex_file)
+
+    # Determine the end of the program
+    program_end = max(hex_data.segments(), key=lambda seg: seg[1])[1]
+    if program_end % 2 == 1:
+      program_end = (program_end + 1) & 0xFFFF
+    print(f"Program end address: {program_end:04X}")
+
+    # Convert the hex file to binary
+    bin_data = hex_data.tobinarray(start=0, size=bin_size)
+    bin_data_cs = hex_data.tobinarray(start=0, size=bin_size2cs)
+    bin_data_cs_real = bin_data_cs[:]
+
+    # Write the binary data to the first file without checksum
+    with open(output_bin_file, 'wb') as f:
+        f.write(bin_data)
+
+    # Запрашиваем у пользователя контрольную сумму
+    while True:
+        try:
+            user_input = input("Введите желаемую контрольную сумму (в формате 0xFFFF): ")
+            target_checksum = int(user_input, 16)
+            if 0 <= target_checksum <= 0xFFFF:
+                break
+            else:
+                print("Ошибка: контрольная сумма должна быть в пределах от 0x0000 до 0xFFFF.")
+        except ValueError:
+            print("Ошибка: введён неправильный формат. Пожалуйста, введите число в шестнадцатеричном формате.")
+
+    # Calculate the checksum
+    checksum = calculate_checksum(bin_data_cs, start_address)
+    checksum_bytes = checksum.to_bytes(2, byteorder='big')
+    print(f"Контрольная сумма исходного файла: {checksum:04X}")
+    with open(output_bin_file_cs_real, 'wb') as f:
+        f.write(bin_data_cs_real)
+        f.write(checksum_bytes)
+
+    # Adjust the bytes immediately after the program end to achieve the target checksum
+    adjust_checksum(bin_data_cs_real, target_checksum, start_address, program_end)
+
+    final_checksum = calculate_checksum(bin_data_cs_real, start_address)
+    final_checksum_bytes = final_checksum.to_bytes(2, 'big')
+
+    # Write the modified binary data to the second file with checksum
+    with open(output_bin_file_cs, 'wb') as f:
+        f.write(bin_data_cs_real)
+        f.write(final_checksum_bytes)
+
+    print(f"Контрольная сумма файла PriborTL7_cs.bin: {final_checksum:04X}")
+
+    if final_checksum == target_checksum:
+        print("Контрольная сумма успешно достигнута.")
+    else:
+        print("Ошибка: контрольная сумма не совпадает!")
+
+if __name__ == "__main__":
+    main()
+
