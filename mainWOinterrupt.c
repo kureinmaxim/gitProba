@@ -14,7 +14,6 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/usart.h>
-#include <libopencm3/stm32/f1/nvic.h>
 
 extern void vApplicationStackOverflowHook(xTaskHandle *pxTask, signed portCHAR *pcTaskName);
 
@@ -43,20 +42,8 @@ static void uart_setup(void) {
 	usart_set_parity(USART1,USART_PARITY_NONE);
 	usart_set_flow_control(USART1,USART_FLOWCONTROL_NONE);
 	usart_enable(USART1);
-
-  nvic_enable_irq(NVIC_USART1_IRQ);
-  usart_enable_rx_interrupt(USART1);
 }
 
- /*********************************************************************
- * Send and receive one character to the UART by interrupt
- *********************************************************************/
-void usart1_isr(void) {
-    if (usart_get_flag(USART1, USART_SR_RXNE)) {
-        char ch = usart_recv(USART1);  // Читаем байт из буфера
-        usart_send(USART1, ch);        // Эхо-ответ
-    }
-}
  /*********************************************************************
  * Send and receive one character to the UART
  *********************************************************************/
@@ -64,9 +51,9 @@ static inline void uart_putc(char ch) {
 	usart_send_blocking(USART1,ch);
 }
 
-/* static char uart_getc(void) {
+static char uart_getc(void) {
         return usart_recv_blocking(USART1);
-} */
+}
 
 /*********************************************************************
  * Send characters to the UART, slowly
@@ -99,15 +86,17 @@ task2(void *args __attribute((unused))) {
     }
 }
 
-/* static void uart_echo_task(void *args __attribute__((unused))) {
+ static void uart_echo_task(void *args __attribute__((unused))) {
     char ch;
-    for (;;) {     
+    for (;;) {
+     /* gpio_toggle(GPIOC,GPIO15);
+     vTaskDelay(pdMS_TO_TICKS(20)); */
       while (!(USART_SR(USART1) & USART_SR_RXNE));
 
       ch = uart_getc();
       uart_putc(ch);
     }
-} */
+}
 
 int main(void) {
 
@@ -120,7 +109,7 @@ int main(void) {
 
   xTaskCreate(task1,"task1_UART_LED",100,NULL,configMAX_PRIORITIES-1,NULL);
   xTaskCreate(task2,"task2_IMP",50,NULL,configMAX_PRIORITIES-1,NULL);
-  //xTaskCreate(uart_echo_task, "uart_echo_task", 100, NULL, configMAX_PRIORITIES-1, NULL);
+  xTaskCreate(uart_echo_task, "uart_echo_task", 100, NULL, configMAX_PRIORITIES-1, NULL);
   vTaskStartScheduler();
 
   for (;;);

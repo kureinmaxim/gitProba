@@ -7,8 +7,7 @@ SRCFILES	= main.c rtos/heap_4.c rtos/list.c rtos/port.c rtos/tasks.c rtos/opencm
 LDSCRIPT	= stm32f103c8t6.ld
 
 CFLAGS += -I/home/mxm/stm32f103c8t6/libopencm3/include/libopencm3/stm32
-CFLAGS += -I/home/mxm/stm32f103c8t6/libopencm3/include
-CFLAGS += -I/home/mxm/stm32f103c8t6/libopencm3/include/libopencm3/stm32/f1
+
 CFLAGS += -I./rtos
 CFLAGS += -I./rtos/portable
 CFLAGS += -I./rtos/include
