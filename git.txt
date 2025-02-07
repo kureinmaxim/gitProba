@@ -1,0 +1,69 @@
+Git   Ctrl L    :x (сохраняем, выходим)
+
+cd /c/Project/Project_PSoC/I2C.cydsn
+cd /c/Project/Project_Git/gitProba
+cd /c/Users/z6364/OneDrive/'Рабочий стол'/ШСК-М
+cd /c/Project/HSK_M/HMX
+cd /c/Project/HSK_M/Sxema
+
+cd /c/Project/Project_CodeMaster/CKP_Prog/CKP_Prog
+cd /c/Project/Project_CodeMaster/PriborTL7/PriborTL7
+cd /c/Project/ProjectQt
+cd /c/Project/Project_STM
+
+При конфликтах в локальном и GitHub
+Если Makefile_1byte должен быть только в blinky2/, 
+то удалите Makefile_1byte:
+
+rm Makefile_1byte
+git add -u        # Добавит все изменения
+git rebase --continue
+git push origin main --force
+
+
+Запустите PowerShell с правами администратора.
+cd C:\Project\Project_Git\gitProba
+cd C:\Project\Project_Python
+python .\Hex2BinAndCheckSum.py          // честно
+python .\Hex2BinAndSelectCheckSum.py    // не очень
+python -m unittest test_crc16.py
+
+
+*** ИЛИ для Windows wsl ***
+cd /mnt/c/Project/Project_Python
+cd /mnt/c/Project/Project_Git/gitProba
+
+
+git config --global user.email "mxm.ekran"
+git config --global user.name "mxm"
+git config --global --list
+git init         git status  
+git rm <file> (удаляет из индекса и раб_каталога)
+git rm <file_old> <file_new>
+git add .                         <=>   git restore .
+
+git config --global core.autocrlf false
+ 
+git commit --amend
+git commit -m "begin" <=>  git restore --staged
+git log         git reflog (история действий)
+git log --oneline --all --graph 
+git blame file -> кто вносил изменения
+
+git checkout master
+git branch -f master e7af662  (переместить ветку master на коммит)
+git checkout fe2b757d...
+git fetch        
+git branch feature/SPI_Program
+git branch == git checkout -b == git switch -c
+git branch -D feature/SPI_Program (удаление ветки)
+git checkout -b feature/restore 8aac675 (востановление в новую
+                                          ветку из удаленной)
+git merge feature/SPI_Program
+
+git diff  (сравнивает индекс и раб_каталог)
+git diff --cached (сравнивает последний commit и индекс)
+git ls-files (все файлы в индексе)
+
+git worktree add -b feature/feat1 feat1 (папка для новой ветке)
+git worktree remove /User/....  (удаление лишних worktree)
