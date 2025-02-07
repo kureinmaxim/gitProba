@@ -15,6 +15,8 @@
 #include "crc16.h"
 
 #include <string.h>  // Для strcmp()
+#include <stdbool.h>
+
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/usart.h>
@@ -24,7 +26,6 @@
 
 volatile uint32_t last_rx_time = 0;       // Время последнего принятого байта
 
-char crcH, crcL;
 
 extern void vApplicationStackOverflowHook(xTaskHandle *pxTask, signed portCHAR *pcTaskName);
 
@@ -85,18 +86,14 @@ static void uart_task(void *args __attribute__((unused))) {
         // Проверяем таймаут
         if (index > 0 && (xTaskGetTickCount() - last_rx_time) > pdMS_TO_TICKS(UART_TIMEOUT_MS)) {
             // Данные приняты, вычисляем CRC16
-            uint16_t crc = crc16(command, index);
-            crcH = (crc >> 8) & 0xFF;
-            crcL = crc & 0xFF;
-
+            crc = process_crc(command, index, true)
             // Выводим CRC в UART
-            uart_putc(crcL);
-            uart_putc(crcH);
+            uart_putc(crc);
             
             // Обработка команды (пример: включение светодиода по первой команде)
-            if (crc == 0 && command[0] == 1 && command[1] == 1) {
+            if (crc == 1 && command[0] == 1 && command[1] == 1) {
                 gpio_clear(GPIOC, GPIO13);                
-            } else if (crc == 0 && command[0] == 0 && command[1] == 0) {
+            } else if (crc == 1 && command[0] == 0 && command[1] == 0) {
                 gpio_set(GPIOC, GPIO13);
             }
             
