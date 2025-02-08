@@ -56,13 +56,18 @@ static void task1(void *args __attribute__((unused))) {
 
 /*********************************************************************
  * toggle PortC -> GPIO15
+ * The function `task2` toggles the state of GPIO pin 15 every 20 milliseconds.
+ * 
+ * @param args In the provided code snippet, the `args` parameter is a void pointer that is not being
+ * used in the `task2` function. It is declared with the `__attribute((unused))` attribute, which is a
+ * compiler directive indicating that the variable is intentionally not used in the function. This
  *********************************************************************/
 static void task2(void *args __attribute((unused))) {
     for (;;)
      {
      //uart_putc('T');  // Check if task2 is running
 	   gpio_toggle(GPIOC,GPIO15);
-	   vTaskDelay(pdMS_TO_TICKS(30));
+	   vTaskDelay(pdMS_TO_TICKS(20));
     }
 }
 
@@ -72,6 +77,7 @@ static void task2(void *args __attribute((unused))) {
 static void uart_task(void *args __attribute__((unused))) {
     uint8_t command[UART_BUF_SIZE];
     uint16_t index = 0;
+    uint16_t crc = 0;
 
     for (;;) {
         char ch;
@@ -86,7 +92,7 @@ static void uart_task(void *args __attribute__((unused))) {
         // Проверяем таймаут
         if (index > 0 && (xTaskGetTickCount() - last_rx_time) > pdMS_TO_TICKS(UART_TIMEOUT_MS)) {
             // Данные приняты, вычисляем CRC16
-            crc = process_crc(command, index, true)
+            crc = process_crc(command, index, true);
             // Выводим CRC в UART
             uart_putc(crc);
             
