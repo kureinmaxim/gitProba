@@ -12,7 +12,7 @@ uint16_t crc16(const uint8_t *data, uint16_t length) {
         crc ^= data[i];
         for (uint8_t j = 0; j < 8; j++) {
             if (crc & 1)
-                crc = (crc >> 1) ^ 0xA001;
+                crc = (crc >> 1) ^ polynomial;
             else
                 crc >>= 1;
         }
@@ -28,7 +28,8 @@ int process_crc(uint8_t *data, uint16_t length, bool checkFlag) {
     if (checkFlag) {
         // Return 1 if CRC is 0, otherwise 0
         return (crc == 0) ? 1 : 0;
-    } else {
+    } 
+    else {
         // Append CRC to data (LSB first, then MSB)
         data[length] = crc & 0xFF;         // Least significant byte
         data[length + 1] = (crc >> 8) & 0xFF;  // Most significant byte
