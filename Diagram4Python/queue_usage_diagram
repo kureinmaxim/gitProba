@@ -1,0 +1,27 @@
+digraph "Queue Usage" {
+	rankdir=TB size="10,8"
+	Start [label="Task Execution Start"]
+	xQueueCreate [label="xQueueCreate()
+Create Queue"]
+	SendData [label="xQueueSend()
+Send Data"]
+	DataSent [label="Data Placed in Queue"]
+	QueueEmpty [label="Queue Empty?"]
+	ReceiveData [label="xQueueReceive()
+Receive Data"]
+	DataReceived [label="Data Successfully Received"]
+	Timeout [label="Timeout Occurred?"]
+	HandleTimeout [label="Handle Timeout
+(e.g., Error Handling)"]
+	End [label="Task Continues"]
+	Start -> xQueueCreate
+	xQueueCreate -> SendData
+	SendData -> DataSent
+	QueueEmpty -> Timeout [label=No]
+	QueueEmpty -> ReceiveData [label=Yes]
+	ReceiveData -> DataReceived [label=Success]
+	Timeout -> HandleTimeout [label=Timeout]
+	DataReceived -> End
+	HandleTimeout -> End
+	End -> QueueEmpty
+}

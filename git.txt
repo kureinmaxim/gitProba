@@ -1,5 +1,15 @@
 Git   Ctrl L    :x (сохраняем, выходим)
 
+To merge the changes from the remote branch 
+into your local branch
+git pull origin main
+
+Push the updated code to the remote
+git push origin main --force
+
+git add . 
+git commit -m "Resolved merge conflicts"
+
 cd /c/Project/Project_PSoC/I2C.cydsn
 cd /c/Project/Project_Git/gitProba
 cd /c/Users/z6364/OneDrive/'Рабочий стол'/ШСК-М
