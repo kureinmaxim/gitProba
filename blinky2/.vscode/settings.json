@@ -1,0 +1,21 @@
+{
+    "configurations": [
+      {
+        "name": "STM32",
+        "includePath": [
+          "${workspaceFolder}/Inc",
+          "${workspaceFolder}/Drivers/CMSIS/Include",
+          "${workspaceFolder}/Drivers/STM32F4xx_HAL_Driver/Inc",
+          "${workspaceFolder}/Middlewares/Third_Party/FreeRTOS/Source/include"
+        ],
+        "defines": ["USE_HAL_DRIVER", "STM32F4XX"],
+        "compilerPath": "/path/to/arm-none-eabi-gcc",
+        "intelliSenseMode": "gcc-arm"
+      }
+    ],
+    "version": 4,
+    "files.associations": {
+      "rcc.h": "c"
+    }
+  }
+  
