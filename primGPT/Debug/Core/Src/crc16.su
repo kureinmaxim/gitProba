@@ -1,0 +1,2 @@
+../Core/Src/crc16.c:8:10:crc16	24	static
+../Core/Src/crc16.c:24:5:process_crc	24	static

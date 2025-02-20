@@ -1,0 +1,9 @@
+../Core/Src/fram.c:5:6:fram_cfg_setup	16	static
+../Core/Src/fram.c:16:5:fram_init	16	static
+../Core/Src/fram.c:25:6:fram_write_enable	24	static
+../Core/Src/fram.c:32:6:fram_write_disable	24	static
+../Core/Src/fram.c:39:9:fram_read_status	24	static
+../Core/Src/fram.c:49:6:fram_write_status	24	static
+../Core/Src/fram.c:58:6:fram_read	32	static
+../Core/Src/fram.c:66:6:fram_write	32	static
+../Core/Src/fram.c:76:6:fram_erase_all	32784	static
