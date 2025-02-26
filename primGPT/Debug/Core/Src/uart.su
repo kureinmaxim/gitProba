@@ -1,8 +1,0 @@
-../Core/Src/uart.c:15:6:log_printf	56	static
-../Core/Src/uart.c:24:5:_write	32	static
-../Core/Src/uart.c:34:7:uart1_put_ch	16	static
-../Core/Src/uart.c:47:7:uart1_put_u16	24	static
-../Core/Src/uart.c:54:7:uart1_put_u32	24	static
-../Core/Src/uart.c:66:6:uart_read	16	static
-../Core/Src/uart.c:82:6:usart_recv_byte	24	static
-../Core/Src/uart.c:91:6:HAL_UART_RxCpltCallback	24	static,ignoring_inline_asm
