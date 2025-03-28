@@ -1,0 +1,21 @@
+@
+Command(Ctrl)+K
+Command(Ctrl)+Shift+K
+
+Ctrl+K
+
+https://www.cursor.com/
+
+\\wsl.localhost\Ubuntu\home\mxm\stm32f103c8t6\rtos\blinky2\main.c
+
+wsl
+
+in PowerShell
+wsl -l -v
+wsl --set-default Ubuntu
+
+
+
+
+
+
