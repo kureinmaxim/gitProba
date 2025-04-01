@@ -1,0 +1,12 @@
+bcryptprimitives.dll
+bcrypt.dll
+setupapi.dll
+cfgmgr32.dll
+gdi32full.dll
+msvcp_win.dll
+VCRUNTIME140.dll
+IMM32.DLL
+DEVOBJ.dll
+WINTRUST.dll
+CRYPT32.dll
+MSASN1.dll

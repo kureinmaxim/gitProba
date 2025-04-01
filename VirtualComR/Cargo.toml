@@ -1,8 +1,21 @@
 [package]
 name = "VirtualComR"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+authors = ["KureinM <kurein.maxim@gmail.com>"]
+description = "Эмулятор последовательного порта с поддержкой русских символов и интерактивным меню"
 
 [dependencies]
-serialport = "4.3.0"
-ctrlc = "3.4.2"
+serialport = "4.2.0"
+ctrlc = "3.2.0"
+encoding_rs = "0.8.32"
+encoding = "0.2.33"
+chardet = "0.2.4"
+crossterm = "0.27.0"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = 'abort'
+strip = true
